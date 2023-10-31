@@ -1,24 +1,15 @@
 use yew::prelude::*;
 
-#[function_component]
-fn App() -> Html {
-    let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
-    };
-
+#[function_component(Game)]
+fn game() -> Html {
     html! {
-        <div>
-            <button {onclick}>{ "+2" }</button>
-            <p>{ *counter }</p>
-        </div>
+        <>
+            <img src={"img/chessboard.jpg"}/>
+            <div class={classes!("absolute")} />
+        </>
     }
 }
 
 fn main() {
-    yew::Renderer::<App>::new().render();
+    yew::Renderer::<Game>::new().render();
 }
