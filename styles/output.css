@@ -533,3 +533,35 @@ video {
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
 }
+
+.flex {
+  display: flex;
+}
+
+.h-\[50rem\] {
+  height: 50rem;
+}
+
+.h-\[6\.25rem\] {
+  height: 6.25rem;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-\[6\.25rem\] {
+  width: 6.25rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
