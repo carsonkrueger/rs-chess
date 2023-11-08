@@ -1,9 +1,5 @@
-use std::char::MAX;
-
-use super::point::Point;
+use crate::library::{board::BoardState, point::Point};
 use num_traits::Num;
-
-static MAX_BOARD_WIDTH: u8 = 8;
 
 #[derive(PartialEq)]
 pub enum ChessPieceType {
@@ -40,21 +36,21 @@ impl ChessPieceType {
     }
 }
 
-enum ChessErr {
-    OUTOFBOUNDS,
-}
-
-pub struct ChessPiece<T: Num> {
+pub struct ChessPiece<'a, T: Num + Copy> {
+    board: &'a BoardState,
     piece_type: ChessPieceType,
-    point: Point<T>,
+    point: Option<Point<T>>,
 }
 
-impl ChessPiece<u8> {
-    pub fn move_to(&self, point: &Point<u8>) -> Result<(), ChessErr> {
+impl<T: Num + Copy> ChessPiece<'_, T> {
+    fn move_to(&self, np: Point<T>) -> Result<(), ()> {
+        if !self.board.valid_move(self.piece_type, np) {
+            return Err(());
+        }
         Ok(())
     }
-    fn valid_move(&self, point: &Point<u8>) -> bool {
-        match self.piece_type {
+    pub fn valid_move(&self, piece_type: ChessPieceType, point: &Point<u8>) -> bool {
+        match piece_type {
             ChessPieceType::WKING => self.valid_king_move(point),
             _ => false,
         }
@@ -71,13 +67,6 @@ impl ChessPiece<u8> {
             Point { x: 0, y: -1 } => true,
             Point { x: -1, y: 0 } => true,
             _ => false,
-        }
-    }
-    fn in_bounds(point: &Point<u8>) -> bool {
-        if point.x < 0 || point.y < 0 || point.x > MAX_BOARD_WIDTH || point.y > MAX_BOARD_WIDTH {
-            return false;
-        } else {
-            return true;
         }
     }
 }
