@@ -1,45 +1,34 @@
+use std::fmt::format;
+
 use crate::library::{
     board::BoardState,
     point::{Dist, Point},
 };
 
+use super::player_state::PlayerColor;
+
 #[derive(PartialEq)]
 pub enum PieceType {
-    WKING,
-    WQUEEN,
-    WBISHOP,
-    WKNIGHT,
-    WROOK,
-    WPAWN,
-    BKING,
-    BQUEEN,
-    BBISHOP,
-    BKNIGHT,
-    BROOK,
-    BPAWN,
+    KING,
+    QUEEN,
+    BISHOP1,
+    BISHOP2,
+    KNIGHT1,
+    KNIGHT2,
+    ROOK1,
+    ROOK2,
+    PAWN1,
+    PAWN2,
+    PAWN3,
+    PAWN4,
+    PAWN5,
+    PAWN6,
+    PAWN7,
+    PAWN8,
 }
 
-impl PieceType {
-    pub fn img_path(&self) -> String {
-        match &self {
-            PieceType::WKING => String::from("img/w_king.png"),
-            PieceType::WQUEEN => String::from("img/w_queen.png"),
-            PieceType::WBISHOP => String::from("img/w_bishop.png"),
-            PieceType::WKNIGHT => String::from("img/w_knight.png"),
-            PieceType::WROOK => String::from("img/w_rook.png"),
-            PieceType::WPAWN => String::from("img/w_pawn.png"),
-            PieceType::BKING => String::from("img/b_king.png"),
-            PieceType::BQUEEN => String::from("img/b_queen.png"),
-            PieceType::BBISHOP => String::from("img/b_bishop.png"),
-            PieceType::BKNIGHT => String::from("img/b_knight.png"),
-            PieceType::BROOK => String::from("img/b_rook.png"),
-            PieceType::BPAWN => String::from("img/b_pawn.png"),
-        }
-    }
-}
-
-pub struct Piece<'a> {
-    board: &'a BoardState,
+#[derive(PartialEq)]
+pub struct Piece {
     pub piece_type: PieceType,
     pub point: Point<u8>,
 }
@@ -49,30 +38,29 @@ pub enum MoveError {
     INVALIDMOVE,
 }
 
-impl Piece<'_> {
-    pub fn move_to(&self, np: &Point<u8>) -> Result<(), MoveError> {
-        if !BoardState::in_bounds(np) {
-            return Err(MoveError::OUTOFBOUNDS);
-        } else if !self.valid_move(&self.piece_type, np) {
-            return Err(MoveError::INVALIDMOVE);
-        }
-        Ok(())
+impl Piece {
+    pub fn move_to(&self, point: Point<u8>) {
+        self.point = point;
     }
-    pub fn valid_move(&self, piece_type: &PieceType, point: &Point<u8>) -> bool {
-        match piece_type {
-            PieceType::WKING => self.valid_king_move(point),
-            _ => false,
-        }
-    }
-    fn valid_king_move(&self, point: &Point<u8>) -> bool {
-        match self.point.relative_point_dist(point) {
-            Dist { x: 1, y: 1 } => true,
-            Dist { x: 0, y: 1 } => true,
-            Dist { x: 1, y: 0 } => true,
-            Dist { x: -1, y: -1 } => true,
-            Dist { x: 0, y: -1 } => true,
-            Dist { x: -1, y: 0 } => true,
-            _ => false,
+    pub fn img_path(&self, color: &PlayerColor) -> String {
+        let ch = match &color {
+            PlayerColor::WHITE => 'w',
+            PlayerColor::BLACK => 'b',
+        };
+        match &self.piece_type {
+            PieceType::KING => format!("img/{}_king.png", ch),
+            PieceType::QUEEN => format!("img/{}_queen.png", ch),
+            PieceType::BISHOP1 | PieceType::BISHOP2 => format!("img/{}_bishop.png", ch),
+            PieceType::KNIGHT1 | PieceType::KNIGHT2 => format!("img/{}_knight.png", ch),
+            PieceType::ROOK1 | PieceType::ROOK2 => format!("img/{}_rook.png", ch),
+            PieceType::PAWN1
+            | PieceType::PAWN2
+            | PieceType::PAWN3
+            | PieceType::PAWN4
+            | PieceType::PAWN5
+            | PieceType::PAWN6
+            | PieceType::PAWN7
+            | PieceType::PAWN8 => format!("img/{}_pawn.png", ch),
         }
     }
 }

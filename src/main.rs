@@ -9,7 +9,7 @@ fn Board() -> Html {
     html! {
         <div class={"flex justify-center items-center"}>
             <img class={"h-[50rem]"} src={"img/chessboard.png"}/>
-            <Piece piece={PieceType::WROOK} point={Point::from((0,0))}/>
+            // <Piece piece={PieceType::ROOK1} point={Point::from((0,0))}/>
         </div>
     }
 }

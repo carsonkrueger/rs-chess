@@ -1,4 +1,4 @@
-use crate::library::piece::MoveError;
+use crate::library::piece::{MoveError, Piece};
 use crate::library::player_state::{PlayerColor, PlayerState};
 use crate::library::point::Point;
 
@@ -15,25 +15,10 @@ impl BoardState {
         Ok(())
     }
     pub fn in_bounds(point: &Point<u8>) -> bool {
-        if point.x < 0 || point.y < 0 || point.x > MAX_BOARD_WIDTH || point.y > MAX_BOARD_WIDTH {
+        if point.x > MAX_BOARD_WIDTH || point.y > MAX_BOARD_WIDTH {
             return false;
         } else {
             return true;
-        }
-    }
-    pub fn is_friendly_piece(&self, point: &Point<u8>, color: &PlayerColor) -> bool {
-        let w = &self.w_player;
-        let b = &self.b_player;
-        match color {
-            PlayerColor::WHITE => {
-                if w.king.is_some() {
-                    return true;
-                }
-                false
-            }
-            PlayerColor::BLACK => match point {
-                _ => true,
-            },
         }
     }
 }

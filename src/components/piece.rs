@@ -3,15 +3,14 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub piece: PieceType,
-    pub point: Point<u8>,
+    pub piece: crate::library::piece::Piece,
 }
 
 #[function_component]
 pub fn Piece(props: &Props) -> Html {
     html! {
         <div class={"h-[6.25rem] w-[6.25rem]"}>
-            <img class={"h-full w-full"} src={format!("img/{}", props.piece.img_path())} />
+            // <img class={"h-full w-full"} src={format!("img/{}", props.piece.img_path())} />
         </div>
     }
 }
