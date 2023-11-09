@@ -1,9 +1,9 @@
-use crate::library::{piece::ChessPieceType, point::Point};
+use crate::library::{piece::PieceType, point::Point};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub piece: ChessPieceType,
+    pub piece: PieceType,
     pub point: Point<u8>,
 }
 

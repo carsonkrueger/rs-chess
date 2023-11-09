@@ -6,6 +6,11 @@ pub struct Point<T: Num + Copy> {
     pub y: T,
 }
 
+pub struct Dist<T: Num + Copy> {
+    pub x: T,
+    pub y: T,
+}
+
 impl<T: Num + Copy> From<(T, T)> for Point<T> {
     fn from(points: (T, T)) -> Self {
         Self {
@@ -15,11 +20,11 @@ impl<T: Num + Copy> From<(T, T)> for Point<T> {
     }
 }
 
-impl<T: Num + Copy> Point<T> {
-    pub fn relative_point_dist(&self, point: &Point<T>) -> Point<T> {
-        Point {
-            x: self.x - point.x,
-            y: self.y - point.y,
+impl Point<u8> {
+    pub fn relative_point_dist(&self, point: &Point<u8>) -> Dist<i32> {
+        Dist {
+            x: self.x as i32 - point.x as i32,
+            y: self.y as i32 - point.y as i32,
         }
     }
 }
