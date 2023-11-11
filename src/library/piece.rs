@@ -27,10 +27,10 @@ pub enum PieceType {
     PAWN8,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub struct Piece {
     pub piece_type: PieceType,
-    pub point: Point<u8>,
+    pub color: PlayerColor,
 }
 
 pub enum MoveError {
@@ -39,43 +39,14 @@ pub enum MoveError {
 }
 
 impl Piece {
-    pub fn new(piece_type: PieceType, color: PlayerColor) -> Piece {
-        let y = match color {
-            PlayerColor::WHITE => 0,
-            PlayerColor::BLACK => 7,
-        };
-        let y2 = match color {
-            PlayerColor::WHITE => 1,
-            PlayerColor::BLACK => 6,
-        };
-
-        Piece {
+    pub fn new(piece_type: PieceType, color: PlayerColor) -> Self {
+        Self {
             piece_type: piece_type,
-            point: match piece_type {
-                PieceType::ROOK1 => Point::from((0, y)),
-                PieceType::KNIGHT1 => Point::from((1, y)),
-                PieceType::BISHOP1 => Point::from((2, y)),
-                PieceType::QUEEN => Point::from((3, y)),
-                PieceType::KING => Point::from((4, y)),
-                PieceType::BISHOP2 => Point::from((5, y)),
-                PieceType::KNIGHT2 => Point::from((6, y)),
-                PieceType::ROOK2 => Point::from((7, y)),
-                PieceType::PAWN1 => Point::from((0, y2)),
-                PieceType::PAWN2 => Point::from((1, y2)),
-                PieceType::PAWN3 => Point::from((2, y2)),
-                PieceType::PAWN4 => Point::from((3, y2)),
-                PieceType::PAWN5 => Point::from((4, y2)),
-                PieceType::PAWN6 => Point::from((5, y2)),
-                PieceType::PAWN7 => Point::from((6, y2)),
-                PieceType::PAWN8 => Point::from((7, y2)),
-            },
+            color: color,
         }
     }
-    pub fn set_point(&mut self, point: Point<u8>) {
-        self.point = point;
-    }
-    pub fn img_path(&self, color: &PlayerColor) -> String {
-        let ch = match &color {
+    pub fn img_path(&self) -> String {
+        let ch = match self.color {
             PlayerColor::WHITE => 'w',
             PlayerColor::BLACK => 'b',
         };
