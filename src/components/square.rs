@@ -13,7 +13,7 @@ pub fn Square(props: &Props) -> Html {
     let point = &board_state.points[props.idx];
     let is_piece = point.data.is_some();
     html! {
-        <div class={"absolute h-[6.25rem] w-[6.25rem]"}>
+        <div class={"z-10 h-[6.25rem] w-[6.25rem]"}>
             if is_piece {<img class={"object-fill"} src={point.data.unwrap().img_path()} />}
         </div>
     }

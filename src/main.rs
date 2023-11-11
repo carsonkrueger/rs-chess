@@ -11,8 +11,8 @@ fn Board() -> Html {
     let board_size = board_state.points.len();
     let list = (0..board_size);
     html! {
-        <div class={"absolute flex-wrap justify-center items-center"}>
-            <img class={"h-[50rem]"} src={"img/chessboard.png"}/>
+        <div class={"flex flex-row flex-wrap justify-center items-center h-[50rem] w-[50rem]"}>
+            <img class={"absolute z-0 h-[50rem] w-[50rem] object-contain"} src={"img/chessboard.png"}/>
             {list.into_iter().map(|i| html! {<Square idx={i}/>}).collect::<Html>()}
         </div>
     }
