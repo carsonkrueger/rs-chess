@@ -1,5 +1,5 @@
 use crate::library::piece::{MoveError, Piece};
-use crate::library::player_state::{PlayerColor, PlayerState};
+use crate::library::player::{PlayerColor, PlayerState};
 use crate::library::point::Point;
 use yewdux::prelude::*;
 
@@ -11,6 +11,8 @@ static MAX_BOARD_WIDTH: u8 = 8;
 pub struct BoardState {
     pub turn: PlayerColor,
     pub points: [Point<u8, Piece>; 64],
+    pub select1_idx: Option<usize>,
+    pub select2_idx: Option<usize>,
 }
 
 impl BoardState {
@@ -30,6 +32,8 @@ impl Default for BoardState {
     fn default() -> Self {
         BoardState {
             turn: PlayerColor::WHITE,
+            select1_idx: None,
+            select2_idx: None,
             points: [
                 Point::new(Piece::new(PieceType::ROOK1, PlayerColor::WHITE)),
                 Point::new(Piece::new(PieceType::KNIGHT1, PlayerColor::WHITE)),

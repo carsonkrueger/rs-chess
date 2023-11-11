@@ -5,7 +5,7 @@ use crate::library::{
     point::{Dist, Point},
 };
 
-use super::player_state::PlayerColor;
+use super::player::PlayerColor;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum PieceType {

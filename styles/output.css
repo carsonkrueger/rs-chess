@@ -637,3 +637,15 @@ video {
   -o-object-fit: fill;
      object-fit: fill;
 }
+
+.hover\:cursor-grabbing:hover {
+  cursor: grabbing;
+}
+
+.focus\:cursor-grab:focus {
+  cursor: grab;
+}
+
+.focus\:cursor-grabbing:focus {
+  cursor: grabbing;
+}

@@ -1,7 +1,7 @@
 use num_traits::Num;
 
 use crate::library::piece::{Piece, PieceType};
-use crate::library::player_state::PlayerColor;
+use crate::library::player::PlayerColor;
 
 #[derive(PartialEq, Copy, Clone)]
 pub struct Point<T: Num + Copy, U> {
