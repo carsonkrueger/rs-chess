@@ -33,17 +33,27 @@ pub struct Piece {
     pub color: PlayerColor,
 }
 
-pub enum MoveError {
-    OUTOFBOUNDS,
-    INVALIDMOVE,
-}
-
 impl Piece {
     pub fn new(piece_type: PieceType, color: PlayerColor) -> Self {
         Self {
             piece_type: piece_type,
             color: color,
         }
+    }
+    pub fn valid_move(p1: &Point<u8, Piece>, p2: &Point<u8, Piece>) -> bool {
+        if p1.data.is_none() {
+            return false;
+        }
+        if p2.data.is_some() && Self::are_friendly(&p1.data.unwrap(), &p2.data.unwrap()) {
+            return false;
+        }
+        true
+        // match p1.data.unwrap().piece_type {
+        //     PieceType::KING => {
+        //         true
+        //     }
+        //     _ => true,
+        // }
     }
     pub fn img_path(&self) -> String {
         let ch = match self.color {
@@ -65,5 +75,8 @@ impl Piece {
             | PieceType::PAWN7
             | PieceType::PAWN8 => format!("img/{}_pawn.png", ch),
         }
+    }
+    pub fn are_friendly(p1: &Piece, p2: &Piece) -> bool {
+        p1.color == p2.color
     }
 }

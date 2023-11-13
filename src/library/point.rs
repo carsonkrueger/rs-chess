@@ -64,10 +64,10 @@ impl Point<u8, Piece> {
 }
 
 impl<U> Point<u8, U> {
-    pub fn set_point(&mut self, point: Point<u8, U>) {
-        self.x = point.x;
-        self.y = point.y;
-    }
+    // pub fn set_point(&mut self, point: Point<u8, U>) {
+    //     self.x = point.x;
+    //     self.y = point.y;
+    // }
     pub fn relative_point_dist(&self, point: &Point<u8, U>) -> Dist<i32> {
         Dist {
             x: self.x as i32 - point.x as i32,

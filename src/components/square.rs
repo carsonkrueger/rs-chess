@@ -12,15 +12,23 @@ pub struct Props {
 #[function_component]
 pub fn Square(props: &Props) -> Html {
     let (board_state, dispatch) = use_store::<BoardState>();
-    let on_click: Callback<BoardState> = dispatch.reduce_callback(|s| {
-        s.select1_idx = Some(0);
-        s
+    let idx = props.idx.clone();
+    let onclick: Callback<MouseEvent> = dispatch.reduce_mut_callback(move |board_state| {
+        if board_state.select1_idx.is_some() && board_state.select2_idx.is_some() {
+            let i1 = board_state.select1_idx.unwrap();
+            let i2 = board_state.select2_idx.unwrap();
+            if i1 != i2 {
+                board_state.play(&mut board_state.points[i1], &mut board_state.points[i2]);
+            }
+        }
+        // board_state.select1_idx = Some(idx);
+        // board_state.points.
     });
     let point = &board_state.points[props.idx];
     let is_piece = point.data.is_some();
     html! {
-        <div class={"focus:cursor-grabbing z-10 h-[6.25rem] w-[6.25rem]"}>
-            if is_piece {<img class={"object-fill"} src={point.data.unwrap().img_path()} />}
+        <div class={"z-10 h-[6.25rem] w-[6.25rem]"}>
+            if is_piece {<img onclick={onclick}  class={"hover:cursor-grabbing object-fill"} src={point.data.unwrap().img_path()} />}
         </div>
     }
 }

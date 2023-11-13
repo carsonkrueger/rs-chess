@@ -1,4 +1,4 @@
-use crate::library::piece::{MoveError, Piece};
+use crate::library::piece::Piece;
 use crate::library::player::{PlayerColor, PlayerState};
 use crate::library::point::Point;
 use yewdux::prelude::*;
@@ -7,7 +7,7 @@ use super::piece::PieceType;
 
 static MAX_BOARD_WIDTH: u8 = 8;
 
-#[derive(Store, PartialEq)]
+#[derive(Store, PartialEq, Clone, Copy)]
 pub struct BoardState {
     pub turn: PlayerColor,
     pub points: [Point<u8, Piece>; 64],
@@ -15,8 +15,29 @@ pub struct BoardState {
     pub select2_idx: Option<usize>,
 }
 
+pub enum MoveError {
+    OutOfBounds,
+    InvalidMove,
+    NoPiece,
+}
+
 impl BoardState {
-    pub fn play(&self, point: &Point<u8, Piece>) -> Result<(), MoveError> {
+    pub unsafe fn play(
+        &self,
+        p1: &mut Point<u8, Piece>,
+        p2: &mut Point<u8, Piece>,
+    ) -> Result<(), MoveError> {
+        if p1.data.is_none() {
+            return Err(MoveError::NoPiece);
+        } else if !Self::in_bounds(p1) || !Self::in_bounds(p2) {
+            return Err(MoveError::OutOfBounds);
+        } else if !Piece::valid_move(p1, p2) {
+            return Err(MoveError::InvalidMove);
+        }
+
+        p2.data = p1.data.clone(); // move piece to second point
+        p1.data = None; // clear initial piece
+
         Ok(())
     }
     pub fn in_bounds(point: &Point<u8, Piece>) -> bool {
