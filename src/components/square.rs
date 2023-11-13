@@ -18,7 +18,7 @@ pub fn Square(props: &Props) -> Html {
             let i1 = board_state.select1_idx.unwrap();
             let i2 = board_state.select2_idx.unwrap();
             if i1 != i2 {
-                board_state.play(&mut board_state.points[i1], &mut board_state.points[i2]);
+                board_state.play();
             }
         }
         // board_state.select1_idx = Some(idx);

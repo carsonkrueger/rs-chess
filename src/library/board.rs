@@ -22,16 +22,14 @@ pub enum MoveError {
 }
 
 impl BoardState {
-    pub unsafe fn play(
-        &self,
-        p1: &mut Point<u8, Piece>,
-        p2: &mut Point<u8, Piece>,
-    ) -> Result<(), MoveError> {
+    pub fn play(&self) -> Result<(), MoveError> {
+        let mut p1 = self.points[self.select1_idx.unwrap()];
+        let mut p2 = self.points[self.select2_idx.unwrap()];
         if p1.data.is_none() {
             return Err(MoveError::NoPiece);
-        } else if !Self::in_bounds(p1) || !Self::in_bounds(p2) {
+        } else if !Self::in_bounds(&p1) || !Self::in_bounds(&p2) {
             return Err(MoveError::OutOfBounds);
-        } else if !Piece::valid_move(p1, p2) {
+        } else if !Piece::valid_move(&p1, &p2) {
             return Err(MoveError::InvalidMove);
         }
 
