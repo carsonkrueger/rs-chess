@@ -40,20 +40,8 @@ impl Piece {
             color: color,
         }
     }
-    pub fn valid_move(p1: &Point<u8, Piece>, p2: &Point<u8, Piece>) -> bool {
-        if p1.data.is_none() {
-            return false;
-        }
-        if p2.data.is_some() && Self::are_friendly(&p1.data.unwrap(), &p2.data.unwrap()) {
-            return false;
-        }
+    pub fn valid_move(p: Piece, from_idx: usize, to_idx: usize) -> bool {
         true
-        // match p1.data.unwrap().piece_type {
-        //     PieceType::KING => {
-        //         true
-        //     }
-        //     _ => true,
-        // }
     }
     pub fn img_path(&self) -> String {
         let ch = match self.color {
