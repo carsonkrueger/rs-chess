@@ -1,6 +1,9 @@
+use std::rc::Rc;
+
 use crate::library::piece::Piece;
 use crate::library::player::{PlayerColor, PlayerState};
 use crate::library::point::Point;
+use crate::Board;
 use yewdux::prelude::*;
 
 use super::piece::PieceType;
@@ -23,8 +26,17 @@ pub enum MoveError {
     InvalidIndex,
 }
 
+pub enum Action {
+    UpdateBoardState(Rc<BoardState>),
+}
+
 impl BoardState {
-    pub fn play(&self) -> Result<(), MoveError> {
+    pub fn reduce(&mut self, action: Action) {
+        match action {
+            Action::UpdateBoardState(new_state) => *self = (*new_state).clone(),
+        }
+    }
+    pub fn play(&mut self) -> Result<(), MoveError> {
         if self.select1_idx.is_none() || self.select2_idx.is_none() {
             return Err(MoveError::InvalidIndex);
         } else if !Self::in_bounds(self.select1_idx.unwrap())
@@ -44,10 +56,15 @@ impl BoardState {
             self.select2_idx.unwrap(),
         ) {
             return Err(MoveError::InvalidMove);
+        } else if Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
+            return Err(MoveError::InvalidMove);
         }
 
-        p2 = p1.clone(); // move piece to second point
-        p1 = None; // clear initial piece
+        // p2 = p1.clone(); // move piece to second point
+        // p1 = None; // clear initial piece
+
+        self.points[self.select1_idx.unwrap()] = None;
+        self.points[self.select2_idx.unwrap()] = p1.clone();
 
         Ok(())
     }
