@@ -50,11 +50,7 @@ impl BoardState {
 
         if p1.is_none() {
             return Err(MoveError::NoPiece);
-        } else if !Piece::valid_move(
-            p1.unwrap(),
-            self.select1_idx.unwrap(),
-            self.select2_idx.unwrap(),
-        ) {
+        } else if !self.valid_move(self.select1_idx.unwrap(), self.select2_idx.unwrap()) {
             return Err(MoveError::InvalidMove);
         } else if p2.is_some() && Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
             return Err(MoveError::InvalidMove);
@@ -74,6 +70,85 @@ impl BoardState {
             return false;
         } else {
             return true;
+        }
+    }
+    pub fn valid_move(&self, from: usize, to: usize) -> bool {
+        let p_from = self.points[from].as_ref().unwrap();
+        let p_to = self.points[to].as_ref();
+        match p_from.piece_type {
+            PieceType::PAWN1
+            | PieceType::PAWN2
+            | PieceType::PAWN3
+            | PieceType::PAWN4
+            | PieceType::PAWN5
+            | PieceType::PAWN6
+            | PieceType::PAWN7
+            | PieceType::PAWN8 => {
+                (Self::is_forward(from, to, p_from.color) && p_to.is_none())
+                    || (p_to.is_some()
+                        && Self::is_adjacent_diagnol_forward(from, to, p_from.color)
+                        && !Piece::are_friendly(p_from, p_to.unwrap()))
+            }
+            PieceType::KNIGHT1 | PieceType::KNIGHT2 => Self::is_knight_hop(from, to),
+            PieceType::BISHOP1 | PieceType::BISHOP2 => Self::is_diagnol(from, to),
+            PieceType::ROOK1 | PieceType::ROOK2 => Self::is_slide(from, to),
+            PieceType::KING => Self::is_adjacent(from, to),
+            PieceType::QUEEN => Self::is_diagnol(from, to) || Self::is_slide(from, to),
+            _ => true,
+        }
+    }
+    fn is_adjacent(from: usize, to: usize) -> bool {
+        match from as i32 - to as i32 {
+            8 => true,
+            -8 => true,
+            1 => true,
+            -1 => true,
+            -9 => true,
+            -7 => true,
+            9 => true,
+            7 => true,
+            _ => false,
+        }
+    }
+    fn is_adjacent_diagnol_forward(from: usize, to: usize, color: PlayerColor) -> bool {
+        match color {
+            PlayerColor::WHITE => match from as i32 - to as i32 {
+                9 => true,
+                7 => true,
+                _ => false,
+            },
+            PlayerColor::BLACK => match from as i32 - to as i32 {
+                -7 => true,
+                -9 => true,
+                _ => false,
+            },
+        }
+    }
+    fn is_diagnol(from: usize, to: usize) -> bool {
+        let dist = from as i32 - to as i32;
+        dist % 9 == 0 || dist % 7 == 0
+    }
+    fn is_knight_hop(from: usize, to: usize) -> bool {
+        match from as i32 - to as i32 {
+            17 => true,
+            15 => true,
+            -17 => true,
+            -15 => true,
+            -10 => true,
+            -6 => true,
+            10 => true,
+            6 => true,
+            _ => false,
+        }
+    }
+    fn is_slide(from: usize, to: usize) -> bool {
+        let dist = from as i32 - to as i32;
+        dist % 8 == 0 || from / 8 == to / 8
+    }
+    fn is_forward(from: usize, to: usize, color: PlayerColor) -> bool {
+        match color {
+            PlayerColor::WHITE => from + 8 == to,
+            PlayerColor::BLACK => from - 8 == to,
         }
     }
 }

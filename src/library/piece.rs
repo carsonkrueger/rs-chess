@@ -40,9 +40,6 @@ impl Piece {
             color: color,
         }
     }
-    pub fn valid_move(p: Piece, from_idx: usize, to_idx: usize) -> bool {
-        true
-    }
     pub fn img_path(&self) -> String {
         let ch = match self.color {
             PlayerColor::WHITE => 'w',
