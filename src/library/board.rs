@@ -91,9 +91,9 @@ impl BoardState {
             }
             PieceType::KNIGHT1 | PieceType::KNIGHT2 => Self::is_knight_hop(from, to),
             PieceType::BISHOP1 | PieceType::BISHOP2 => Self::is_diagnol(from, to),
-            PieceType::ROOK1 | PieceType::ROOK2 => Self::is_slide(from, to),
+            PieceType::ROOK1 | PieceType::ROOK2 => self.is_slide(from, to),
             PieceType::KING => Self::is_adjacent(from, to),
-            PieceType::QUEEN => Self::is_diagnol(from, to) || Self::is_slide(from, to),
+            PieceType::QUEEN => Self::is_diagnol(from, to) || self.is_slide(from, to),
             _ => true,
         }
     }
@@ -141,15 +141,50 @@ impl BoardState {
             _ => false,
         }
     }
-    fn is_slide(from: usize, to: usize) -> bool {
+    fn is_slide(&self, from: usize, to: usize) -> bool {
         let dist = from as i32 - to as i32;
-        dist % 8 == 0 || from / 8 == to / 8
+        let is_row = from / 8 == to / 8;
+        let is_col = dist % 8 == 0;
+
+        if !is_col && !is_row {
+            return false;
+        }
+
+        if dist < -7 || dist < 7 {
+            let start = 'outer: {
+                if dist < -8 {
+                    break 'outer from - 1;
+                }
+                from + 1
+            };
+
+            for i in start..to {
+                let is_row = from / 8 == i / 8;
+                if !is_row {
+                    break;
+                } else if self.points[i].is_some() {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
     fn is_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
             PlayerColor::WHITE => from + 8 == to,
             PlayerColor::BLACK => from - 8 == to,
         }
+    }
+    fn are_friendly(&self, i1: usize, i2: usize) -> bool {
+        let p1 = self.points[i1];
+        let p2 = self.points[i2];
+
+        if p1.is_some() && p2.is_some() {
+            return Piece::are_friendly(&p1.unwrap(), &p2.unwrap());
+        }
+
+        false
     }
 }
 
