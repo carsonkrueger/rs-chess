@@ -56,7 +56,7 @@ impl BoardState {
             self.select2_idx.unwrap(),
         ) {
             return Err(MoveError::InvalidMove);
-        } else if Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
+        } else if p2.is_some() && Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
             return Err(MoveError::InvalidMove);
         }
 
@@ -69,7 +69,8 @@ impl BoardState {
         Ok(())
     }
     pub fn in_bounds(idx: usize) -> bool {
-        if idx > MAX_BOARD_WIDTH || idx > MAX_BOARD_WIDTH {
+        // if idx > MAX_BOARD_WIDTH || idx > MAX_BOARD_WIDTH {
+        if idx >= MAX_BOARD_WIDTH * MAX_BOARD_WIDTH {
             return false;
         } else {
             return true;

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 collect_slice = "1.2.0"
+gloo = "0.10.0"
 num-traits = "0.2.17"
 yew = { version = "0.21.0", features = ["csr"] }
 yewdux = "0.9.4"
