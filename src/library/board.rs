@@ -4,6 +4,7 @@ use crate::library::piece::Piece;
 use crate::library::player::{PlayerColor, PlayerState};
 use crate::library::point::Point;
 use crate::Board;
+use gloo::console::log;
 use yewdux::prelude::*;
 
 use super::piece::PieceType;
@@ -142,7 +143,7 @@ impl BoardState {
         }
     }
     fn is_slide(&self, from: usize, to: usize) -> bool {
-        let dist = from as i32 - to as i32;
+        let dist = to as i32 - from as i32;
         let is_row = from / 8 == to / 8;
         let is_col = dist % 8 == 0;
 
@@ -150,15 +151,17 @@ impl BoardState {
             return false;
         }
 
-        if dist < -7 || dist < 7 {
-            let start = 'outer: {
-                if dist < -8 {
-                    break 'outer from - 1;
+        if is_row && dist > 0 {
+            for i in from + 1..to {
+                let is_row = from / 8 == i / 8;
+                if !is_row {
+                    break;
+                } else if self.points[i].is_some() {
+                    return false;
                 }
-                from + 1
-            };
-
-            for i in start..to {
+            }
+        } else if is_row && dist < 0 {
+            for i in (to..from - 1).rev() {
                 let is_row = from / 8 == i / 8;
                 if !is_row {
                     break;
