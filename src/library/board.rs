@@ -93,6 +93,7 @@ impl BoardState {
                     || (p_to.is_some()
                         && Self::is_adjacent_diagnol_forward(from, to, p_from.color)
                         && !Piece::are_friendly(p_from, p_to.unwrap()))
+                    || (Self::forward_twice_on_1_or_6(from, to, p_from.color) && p_to.is_none())
             }
             PieceType::KNIGHT => Self::is_knight_hop(from, to),
             PieceType::BISHOP => Self::is_diagnol(from, to),
@@ -149,6 +150,28 @@ impl BoardState {
             PlayerColor::BLACK => match from as i32 - to as i32 {
                 -7 => true,
                 -9 => true,
+                _ => false,
+            },
+        }
+    }
+    fn forward_twice_on_1_or_6(from: usize, to: usize, color: PlayerColor) -> bool {
+        if Self::row_num(from) != 1 || Self::row_num(from) != 6 {
+            return false;
+        }
+
+        if Self::col_num(from) != Self::col_num(to) {
+            return false;
+        }
+
+        let dist = from as i32 - to as i32;
+
+        match color {
+            PlayerColor::WHITE => match from as i32 - to as i32 {
+                16 => true,
+                _ => false,
+            },
+            PlayerColor::BLACK => match from as i32 - to as i32 {
+                -16 => true,
                 _ => false,
             },
         }
