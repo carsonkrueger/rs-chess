@@ -4,5 +4,3 @@ pub mod board;
 pub mod piece;
 #[allow(unused)]
 pub mod player;
-#[allow(unused)]
-pub mod point;

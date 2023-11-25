@@ -1,5 +1,5 @@
 use super::piece::PieceType;
-use crate::library::{piece::Piece, point::Point};
+use crate::library::piece::Piece;
 use collect_slice::CollectSlice;
 
 #[derive(PartialEq, Clone, Copy)]
