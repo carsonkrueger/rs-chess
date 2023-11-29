@@ -5,11 +5,11 @@ Gimmicks with project currently:
 - Not all movements are checked to be valid yet
 - You can take the king
 
+WASM is needed:
+rustup target add wasm32-unknown-unknown
+
 Trunk is needed to run the application, install:
 cargo install --locked trunk
-
-WASM is also need:
-rustup target add wasm32-unknown-unknown
 
 Finally run application:
 trunk serve --open
