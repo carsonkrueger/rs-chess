@@ -5,10 +5,16 @@ Gimmicks with project currently:
 - Not all movements are checked to be valid yet
 - You can take the king
 
-Trunk is needed to run the application, install: https://trunkrs.dev/
+Trunk is needed to run the application, install:
+cargo install --locked trunk
 
-Run application:
+WASM is also need:
+rustup target add wasm32-unknown-unknown
+
+Finally run application:
 trunk serve --open
+
+You do not need to do anything below this point
 
 For developement:
 Watch rust file changes:
