@@ -84,14 +84,10 @@ impl BoardState {
             let p1 = &self.points[i1];
             let p2 = &self.points[i2];
 
-            if p1.is_some() && p2.is_some() {
-                let are_friendly = Piece::are_friendly(&p1.unwrap(), &p2.unwrap());
+            if p1.is_some() && p2.is_some() && Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
                 self.select1_idx = Some(i1);
                 self.select2_idx = None;
-                return ();
-            }
-
-            if i1 != i2 {
+            } else if i1 != i2 {
                 self.play();
                 self.select1_idx = None;
                 self.select2_idx = None;
@@ -127,7 +123,6 @@ impl BoardState {
             PieceType::ROOK => self.is_slide(from, to),
             PieceType::KING => Self::is_adjacent(from, to),
             PieceType::QUEEN => Self::is_diagnol(from, to) || self.is_slide(from, to),
-            // _ => true,
         }
     }
     fn try_pawn_upgrade(&mut self, pos: usize) {
@@ -170,13 +165,13 @@ impl BoardState {
     fn is_adjacent_diagnol_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
             PlayerColor::WHITE => match from as i32 - to as i32 {
-                9 => true,
-                7 => true,
+                -9 => true,
+                -7 => true,
                 _ => false,
             },
             PlayerColor::BLACK => match from as i32 - to as i32 {
-                -7 => true,
-                -9 => true,
+                7 => true,
+                9 => true,
                 _ => false,
             },
         }
@@ -186,19 +181,15 @@ impl BoardState {
             return false;
         }
 
-        if Self::col_num(from) != Self::col_num(to) {
-            return false;
-        }
-
         let dist = from as i32 - to as i32;
 
         match color {
             PlayerColor::WHITE => match from as i32 - to as i32 {
-                16 => true,
+                -16 => true,
                 _ => false,
             },
             PlayerColor::BLACK => match from as i32 - to as i32 {
-                -16 => true,
+                16 => true,
                 _ => false,
             },
         }
