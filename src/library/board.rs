@@ -36,7 +36,7 @@ impl BoardState {
             Action::UpdateBoardState(new_state) => *self = (*new_state).clone(),
         }
     }
-    pub fn play(&mut self) -> Result<(), MoveError> {
+    fn play(&mut self) -> Result<(), MoveError> {
         if self.select1_idx.is_none() || self.select2_idx.is_none() {
             return Err(MoveError::InvalidIndex);
         } else if !Self::in_bounds(self.select1_idx.unwrap())
@@ -71,7 +71,7 @@ impl BoardState {
 
         Ok(())
     }
-    pub fn select_then_play(&mut self, idx: usize) {
+    pub fn select(&mut self, idx: usize) {
         if self.select1_idx.is_none() {
             self.select1_idx = Some(idx);
         } else if self.select2_idx.is_none() {
@@ -85,9 +85,9 @@ impl BoardState {
             let p2 = &self.points[i2];
 
             if p1.is_some() && p2.is_some() && Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
-                self.select1_idx = Some(i1);
+                self.select1_idx = Some(i2);
                 self.select2_idx = None;
-            } else if i1 != i2 {
+            } else {
                 self.play();
                 self.select1_idx = None;
                 self.select2_idx = None;
@@ -177,7 +177,7 @@ impl BoardState {
         }
     }
     fn forward_twice_on_1_or_6(from: usize, to: usize, color: PlayerColor) -> bool {
-        if Self::row_num(from) != 1 || Self::row_num(from) != 6 {
+        if Self::row_num(from) != 1 && Self::row_num(from) != 6 {
             return false;
         }
 

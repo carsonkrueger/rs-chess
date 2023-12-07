@@ -13,29 +13,26 @@ pub fn Square(props: &Props) -> Html {
     let idx = props.idx.clone();
 
     let onclick: Callback<MouseEvent> = dispatch.reduce_mut_callback(move |s: &mut BoardState| {
-        s.select_then_play(idx);
-        // if s.select1_idx.is_none() {
-        //     s.select1_idx = Some(idx);
-        // } else if s.select2_idx.is_none() {
-        //     s.select2_idx = Some(idx);
-        // }
-
-        // if s.select1_idx.is_some() && s.select2_idx.is_some() {
-        //     let i1 = s.select1_idx.unwrap();
-        //     let i2 = s.select2_idx.unwrap();
-        //     if i1 != i2 {
-        //         s.play();
-        //     }
-        //     s.select1_idx = None;
-        //     s.select2_idx = None;
-        // }
+        s.select(idx);
     });
 
     let point = &board_state.points[props.idx];
     let is_piece = point.is_some();
+
     html! {
-        <div onclick={onclick} class={"z-10 h-[6.25rem] w-[6.25rem]"}>
+        <div onclick={onclick} class={format!("z-10 h-[6.25rem] w-[6.25rem] {}", bg_color(idx))}>
             if is_piece {<img class={"hover:cursor-grabbing object-fill"} src={point.unwrap().img_path()} />}
         </div>
+    }
+}
+
+fn bg_color(idx: usize) -> String {
+    let is_odd_sq = idx % 2 == 0;
+    let is_odd_row = idx % 8 == 0;
+
+    match 
+    match square_re == 0 {
+        true => String::from("bg-white"),
+        false => String::from("bg-gray-400"),
     }
 }
