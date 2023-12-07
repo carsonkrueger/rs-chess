@@ -13,21 +13,22 @@ pub fn Square(props: &Props) -> Html {
     let idx = props.idx.clone();
 
     let onclick: Callback<MouseEvent> = dispatch.reduce_mut_callback(move |s: &mut BoardState| {
-        if s.select1_idx.is_none() {
-            s.select1_idx = Some(idx);
-        } else if s.select2_idx.is_none() {
-            s.select2_idx = Some(idx);
-        }
+        s.select_then_play(idx);
+        // if s.select1_idx.is_none() {
+        //     s.select1_idx = Some(idx);
+        // } else if s.select2_idx.is_none() {
+        //     s.select2_idx = Some(idx);
+        // }
 
-        if s.select1_idx.is_some() && s.select2_idx.is_some() {
-            let i1 = s.select1_idx.unwrap();
-            let i2 = s.select2_idx.unwrap();
-            if i1 != i2 {
-                s.play();
-            }
-            s.select1_idx = None;
-            s.select2_idx = None;
-        }
+        // if s.select1_idx.is_some() && s.select2_idx.is_some() {
+        //     let i1 = s.select1_idx.unwrap();
+        //     let i2 = s.select2_idx.unwrap();
+        //     if i1 != i2 {
+        //         s.play();
+        //     }
+        //     s.select1_idx = None;
+        //     s.select2_idx = None;
+        // }
     });
 
     let point = &board_state.points[props.idx];

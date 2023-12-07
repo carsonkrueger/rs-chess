@@ -13,7 +13,7 @@ fn Board() -> Html {
     html! {
         <div class={"flex flex-row flex-wrap justify-center items-center h-[50rem] w-[50rem]"}>
             <img class={"absolute z-0 h-[50rem] w-[50rem] object-contain"} src={"img/chessboard.png"}/>
-            {list.into_iter().map(|i| html! {<Square idx={i}/>}).collect::<Html>()}
+            {list.into_iter().map(|i| html! {<Square idx={i}/>}).rev().collect::<Html>()}
         </div>
     }
 }

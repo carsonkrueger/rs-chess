@@ -71,6 +71,33 @@ impl BoardState {
 
         Ok(())
     }
+    pub fn select_then_play(&mut self, idx: usize) {
+        if self.select1_idx.is_none() {
+            self.select1_idx = Some(idx);
+        } else if self.select2_idx.is_none() {
+            self.select2_idx = Some(idx);
+        }
+
+        if self.select1_idx.is_some() && self.select2_idx.is_some() {
+            let i1 = self.select1_idx.unwrap();
+            let i2 = self.select2_idx.unwrap();
+            let p1 = &self.points[i1];
+            let p2 = &self.points[i2];
+
+            if p1.is_some() && p2.is_some() {
+                let are_friendly = Piece::are_friendly(&p1.unwrap(), &p2.unwrap());
+                self.select1_idx = Some(i1);
+                self.select2_idx = None;
+                return ();
+            }
+
+            if i1 != i2 {
+                self.play();
+                self.select1_idx = None;
+                self.select2_idx = None;
+            }
+        }
+    }
     pub fn in_bounds(idx: usize) -> bool {
         // if idx > MAX_BOARD_WIDTH || idx > MAX_BOARD_WIDTH {
         if idx >= MAX_BOARD_WIDTH * MAX_BOARD_WIDTH {
