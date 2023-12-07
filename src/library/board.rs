@@ -4,6 +4,9 @@ use crate::library::piece::Piece;
 use crate::library::player::{PlayerColor, PlayerState};
 use crate::Board;
 use gloo::console::log;
+use rodio::{source::Source, Decoder, OutputStream};
+use std::fs::File;
+use std::io::BufReader;
 use yewdux::prelude::*;
 
 use super::piece::PieceType;
@@ -56,11 +59,14 @@ impl BoardState {
             return Err(MoveError::InvalidMove);
         }
 
-        // p2 = p1.clone(); // move piece to second point
-        // p1 = None; // clear initial piece
-
         self.points[self.select1_idx.unwrap()] = None;
         self.points[self.select2_idx.unwrap()] = p1.clone();
+
+        // let (_stream, stream_handle) = OutputStream::try_default().unwrap();
+        // let file = BufReader::new(File::open("sound/move-self.mp3").unwrap());
+        // let source = Decoder::new(file).unwrap();
+        // stream_handle.play_raw(source.convert_samples());
+        // std::thread::sleep(std::time::Duration::from_secs(1));
 
         self.try_pawn_upgrade(self.select2_idx.unwrap()); // Upgrades pawns on other side of board
 
@@ -91,6 +97,12 @@ impl BoardState {
                 self.play();
                 self.select1_idx = None;
                 self.select2_idx = None;
+            }
+        } else if self.select1_idx.is_some() && self.select2_idx.is_none() {
+            let i1 = self.select1_idx.unwrap();
+            let p1 = &self.points[i1];
+            if (p1.is_some() && p1.unwrap().color != self.turn) || p1.is_none() {
+                self.select1_idx = None;
             }
         }
     }
@@ -197,20 +209,6 @@ impl BoardState {
     fn is_diagnol(from: usize, to: usize) -> bool {
         let dist = from as i32 - to as i32;
         dist % 9 == 0 || dist % 7 == 0
-        // if !(dist % 9 == 0 || dist % 7 == 0) {
-        //     return false;
-        // }
-
-        // let is_left_move = (from % 8) > (to % 8);
-
-        // if dist < 0 {
-        //     let x = 0;
-        //     let r = (to + 1..from).filter(move |n| {
-        //         x += 1;
-        //     });
-        // }
-
-        // true
     }
     fn is_knight_hop(from: usize, to: usize) -> bool {
         match from as i32 - to as i32 {
