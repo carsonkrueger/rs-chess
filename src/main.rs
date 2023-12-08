@@ -7,12 +7,12 @@ use yewdux::prelude::*;
 
 #[function_component]
 fn Board() -> Html {
-    let (board_state, dispatch) = use_store::<BoardState>();
+    let (board_state, _dispatch) = use_store::<BoardState>();
     let board_size = board_state.points.len();
     let list = 0..board_size;
     let color = match board_state.turn {
-        PlayerColor::WHITE => "White",
-        PlayerColor::BLACK => "Black",
+        PlayerColor::White => "White",
+        PlayerColor::Black => "Black",
     };
     html! {
         <div class={"flex flex-col h-[100vh] justify-center items-center bg-[#5A5A5A]"}>

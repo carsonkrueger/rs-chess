@@ -10,7 +10,7 @@ pub struct Props {
 #[function_component]
 pub fn Square(props: &Props) -> Html {
     let (board_state, dispatch) = use_store::<BoardState>();
-    let idx = props.idx.clone();
+    let idx = props.idx;
 
     let onclick: Callback<MouseEvent> = dispatch.reduce_mut_callback(move |s: &mut BoardState| {
         s.select(idx);

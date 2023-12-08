@@ -4,8 +4,8 @@ use collect_slice::CollectSlice;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum PlayerColor {
-    WHITE,
-    BLACK,
+    White,
+    Black,
 }
 
 #[derive(PartialEq)]

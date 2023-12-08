@@ -36,7 +36,7 @@ pub enum Action {
 impl BoardState {
     pub fn reduce(&mut self, action: Action) {
         match action {
-            Action::UpdateBoardState(new_state) => *self = (*new_state).clone(),
+            Action::UpdateBoardState(new_state) => *self = (*new_state),
         }
     }
     fn play(&mut self) -> Result<(), MoveError> {
@@ -55,24 +55,20 @@ impl BoardState {
             return Err(MoveError::NoPiece);
         } else if !self.valid_move(self.select1_idx.unwrap(), self.select2_idx.unwrap()) {
             return Err(MoveError::InvalidMove);
-        } else if p2.is_some() && Piece::are_friendly(&p1.unwrap(), &p2.unwrap()) {
-            return Err(MoveError::InvalidMove);
+        } else if let (Some(i1), Some(i2)) = (p1, p2) {
+            if Piece::are_friendly(&i1, &i2) {
+                return Err(MoveError::InvalidMove);
+            }
         }
 
         self.points[self.select1_idx.unwrap()] = None;
-        self.points[self.select2_idx.unwrap()] = p1.clone();
-
-        // let (_stream, stream_handle) = OutputStream::try_default().unwrap();
-        // let file = BufReader::new(File::open("sound/move-self.mp3").unwrap());
-        // let source = Decoder::new(file).unwrap();
-        // stream_handle.play_raw(source.convert_samples());
-        // std::thread::sleep(std::time::Duration::from_secs(1));
+        self.points[self.select2_idx.unwrap()] = p1;
 
         self.try_pawn_upgrade(self.select2_idx.unwrap()); // Upgrades pawns on other side of board
 
         self.turn = match self.turn {
-            PlayerColor::WHITE => PlayerColor::BLACK,
-            PlayerColor::BLACK => PlayerColor::WHITE,
+            PlayerColor::White => PlayerColor::Black,
+            PlayerColor::Black => PlayerColor::White,
         };
 
         Ok(())
@@ -107,12 +103,7 @@ impl BoardState {
         }
     }
     pub fn in_bounds(idx: usize) -> bool {
-        // if idx > MAX_BOARD_WIDTH || idx > MAX_BOARD_WIDTH {
-        if idx >= MAX_BOARD_WIDTH * MAX_BOARD_WIDTH {
-            return false;
-        } else {
-            return true;
-        }
+        idx < MAX_BOARD_WIDTH * MAX_BOARD_WIDTH
     }
     pub fn valid_move(&self, from: usize, to: usize) -> bool {
         let p_from = self.points[from].as_ref().unwrap();
@@ -123,34 +114,33 @@ impl BoardState {
         }
 
         match p_from.piece_type {
-            PieceType::PAWN => {
+            PieceType::Pawn => {
                 (Self::is_forward(from, to, p_from.color) && p_to.is_none())
                     || (p_to.is_some()
                         && Self::is_adjacent_diagnol_forward(from, to, p_from.color)
                         && !Piece::are_friendly(p_from, p_to.unwrap()))
                     || (Self::forward_twice_on_1_or_6(from, to, p_from.color) && p_to.is_none())
             }
-            PieceType::KNIGHT => Self::is_knight_hop(from, to),
-            PieceType::BISHOP => Self::is_diagnol(from, to),
-            PieceType::ROOK => self.is_slide(from, to),
-            PieceType::KING => Self::is_adjacent(from, to),
-            PieceType::QUEEN => Self::is_diagnol(from, to) || self.is_slide(from, to),
+            PieceType::Knight => Self::is_knight_hop(from, to),
+            PieceType::Bishop => Self::is_diagnol(from, to),
+            PieceType::Rook => self.is_slide(from, to),
+            PieceType::King => Self::is_adjacent(from, to),
+            PieceType::Queen => Self::is_diagnol(from, to) || self.is_slide(from, to),
         }
     }
     fn try_pawn_upgrade(&mut self, pos: usize) {
         match &mut self.points[pos] {
             Some(p) => {
-                if p.piece_type != PieceType::PAWN {
+                if p.piece_type != PieceType::Pawn {
                     return;
                 }
 
-                if p.color == PlayerColor::WHITE && Self::row_num(pos) != 7 {
-                    return;
-                } else if p.color == PlayerColor::BLACK && Self::row_num(pos) != 0 {
+                if (p.color == PlayerColor::White && Self::row_num(pos) != 7)
+                    || (p.color == PlayerColor::Black && Self::row_num(pos) != 0)
+                {
                     return;
                 }
-
-                p.piece_type = PieceType::QUEEN
+                p.piece_type = PieceType::Queen
             }
             None => (),
         }
@@ -162,30 +152,12 @@ impl BoardState {
         pos % 8
     }
     fn is_adjacent(from: usize, to: usize) -> bool {
-        match from as i32 - to as i32 {
-            8 => true,
-            -8 => true,
-            1 => true,
-            -1 => true,
-            -9 => true,
-            -7 => true,
-            9 => true,
-            7 => true,
-            _ => false,
-        }
+        matches!(from as i32 - to as i32, 8 | -8 | 1 | -1 | -9 | -7 | 9 | 7)
     }
     fn is_adjacent_diagnol_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
-            PlayerColor::WHITE => match from as i32 - to as i32 {
-                -9 => true,
-                -7 => true,
-                _ => false,
-            },
-            PlayerColor::BLACK => match from as i32 - to as i32 {
-                7 => true,
-                9 => true,
-                _ => false,
-            },
+            PlayerColor::White => matches!(from as i32 - to as i32, -7 | -9),
+            PlayerColor::Black => matches!(from as i32 - to as i32, 7 | 9),
         }
     }
     fn forward_twice_on_1_or_6(from: usize, to: usize, color: PlayerColor) -> bool {
@@ -196,14 +168,8 @@ impl BoardState {
         let dist = from as i32 - to as i32;
 
         match color {
-            PlayerColor::WHITE => match from as i32 - to as i32 {
-                -16 => true,
-                _ => false,
-            },
-            PlayerColor::BLACK => match from as i32 - to as i32 {
-                16 => true,
-                _ => false,
-            },
+            PlayerColor::White => matches!(from as i32 - to as i32, -16),
+            PlayerColor::Black => matches!(from as i32 - to as i32, 16),
         }
     }
     fn is_diagnol(from: usize, to: usize) -> bool {
@@ -211,17 +177,10 @@ impl BoardState {
         dist % 9 == 0 || dist % 7 == 0
     }
     fn is_knight_hop(from: usize, to: usize) -> bool {
-        match from as i32 - to as i32 {
-            17 => true,
-            15 => true,
-            -17 => true,
-            -15 => true,
-            -10 => true,
-            -6 => true,
-            10 => true,
-            6 => true,
-            _ => false,
-        }
+        matches!(
+            from as i32 - to as i32,
+            17 | 15 | -17 | -15 | -10 | -6 | 10 | 6
+        )
     }
     fn is_slide(&self, from: usize, to: usize) -> bool {
         let dist = to as i32 - from as i32;
@@ -279,16 +238,13 @@ impl BoardState {
     }
     fn is_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
-            PlayerColor::WHITE => from + 8 == to,
-            PlayerColor::BLACK => from - 8 == to,
+            PlayerColor::White => from + 8 == to,
+            PlayerColor::Black => from - 8 == to,
         }
     }
     fn are_friendly(&self, i1: usize, i2: usize) -> bool {
-        let p1 = self.points[i1];
-        let p2 = self.points[i2];
-
-        if p1.is_some() && p2.is_some() {
-            return Piece::are_friendly(&p1.unwrap(), &p2.unwrap());
+        if let (Some(p1), Some(p2)) = (self.points[i1], self.points[i2]) {
+            return Piece::are_friendly(&p1, &p2);
         }
 
         false
@@ -298,26 +254,26 @@ impl BoardState {
 impl Default for BoardState {
     fn default() -> Self {
         BoardState {
-            turn: PlayerColor::WHITE,
+            turn: PlayerColor::White,
             select1_idx: None,
             select2_idx: None,
             points: [
-                Some(Piece::new(PieceType::ROOK, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::KNIGHT, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::BISHOP, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::KING, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::QUEEN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::BISHOP, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::KNIGHT, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::ROOK, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::WHITE)),
+                Some(Piece::new(PieceType::Rook, PlayerColor::White)),
+                Some(Piece::new(PieceType::Knight, PlayerColor::White)),
+                Some(Piece::new(PieceType::Bishop, PlayerColor::White)),
+                Some(Piece::new(PieceType::King, PlayerColor::White)),
+                Some(Piece::new(PieceType::Queen, PlayerColor::White)),
+                Some(Piece::new(PieceType::Bishop, PlayerColor::White)),
+                Some(Piece::new(PieceType::Knight, PlayerColor::White)),
+                Some(Piece::new(PieceType::Rook, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::White)),
                 None,
                 None,
                 None,
@@ -350,22 +306,22 @@ impl Default for BoardState {
                 None,
                 None,
                 None,
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::PAWN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::ROOK, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::KNIGHT, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::BISHOP, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::KING, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::QUEEN, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::BISHOP, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::KNIGHT, PlayerColor::BLACK)),
-                Some(Piece::new(PieceType::ROOK, PlayerColor::BLACK)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Pawn, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Rook, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Knight, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Bishop, PlayerColor::Black)),
+                Some(Piece::new(PieceType::King, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Queen, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Bishop, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Knight, PlayerColor::Black)),
+                Some(Piece::new(PieceType::Rook, PlayerColor::Black)),
             ],
         }
     }
