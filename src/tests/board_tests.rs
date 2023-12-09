@@ -100,3 +100,17 @@ fn is_slide() {
     assert!(!b.is_slide(9, 16));
     assert!(!b.is_slide(9, 18));
 }
+
+#[test]
+fn are_friendly() {
+    let b = BoardState::default();
+    assert!(b.are_friendly(0, 1));
+    assert!(b.are_friendly(7, 15));
+
+    assert!(!b.are_friendly(7, 16));
+    assert!(!b.are_friendly(29, 19));
+    assert!(!b.are_friendly(23, 47));
+
+    assert!(b.are_friendly(53, 62));
+    assert!(b.are_friendly(50, 55));
+}
