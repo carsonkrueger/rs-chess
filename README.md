@@ -3,6 +3,8 @@ The game was built using a rust web framework, Yew. Normal chess rules
 apply besides some special rules like castling, en passant, and automatic
 king checking.
 
+View a demo of the application here: https://www.youtube.com/watch?v=V4Y_sicRttw
+
 HOW TO BEGIN PLAYING:
 
 WASM is needed:

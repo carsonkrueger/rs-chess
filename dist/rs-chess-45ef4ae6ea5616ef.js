@@ -666,7 +666,7 @@ async function __wbg_init(input) {
     if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
-        input = new URL('rs-chess-ef4be1410cd0e6d8_bg.wasm', import.meta.url);
+        input = new URL('rs-chess-45ef4ae6ea5616ef_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
