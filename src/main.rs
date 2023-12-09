@@ -1,5 +1,6 @@
 mod components;
 mod library;
+mod tests;
 use components::square::Square;
 use library::{board::BoardState, player::PlayerColor};
 use yew::prelude::*;

@@ -13,6 +13,7 @@ use super::piece::PieceType;
 
 static MAX_BOARD_WIDTH: usize = 8;
 
+/// Contains the state of chess board, (8x8)
 #[derive(Store, PartialEq, Clone, Copy)]
 pub struct BoardState {
     pub turn: PlayerColor,
@@ -29,16 +30,9 @@ pub enum MoveError {
     InvalidIndex,
 }
 
-pub enum Action {
-    UpdateBoardState(Rc<BoardState>),
-}
-
 impl BoardState {
-    pub fn reduce(&mut self, action: Action) {
-        match action {
-            Action::UpdateBoardState(new_state) => *self = (*new_state),
-        }
-    }
+    /// Moves the piece from BoardState.select1_idx to the BoardState.select2_idx.
+    /// Returns result whether move was succesful or not.
     fn play(&mut self) -> Result<(), MoveError> {
         if self.select1_idx.is_none() || self.select2_idx.is_none() {
             return Err(MoveError::InvalidIndex);
@@ -73,6 +67,7 @@ impl BoardState {
 
         Ok(())
     }
+    /// Selects an index on the board. Second selection will move the piece using BoardState::play()
     pub fn select(&mut self, idx: usize) {
         if self.select1_idx.is_none() {
             self.select1_idx = Some(idx);
@@ -102,9 +97,11 @@ impl BoardState {
             }
         }
     }
+    /// Returns bool whether or not index is in bounds of the chess board area
     pub fn in_bounds(idx: usize) -> bool {
         idx < MAX_BOARD_WIDTH * MAX_BOARD_WIDTH
     }
+    /// Returns bool whether or not piece at index 1 to index 2 is a valid move
     pub fn valid_move(&self, from: usize, to: usize) -> bool {
         let p_from = self.points[from].as_ref().unwrap();
         let p_to = self.points[to].as_ref();
@@ -128,6 +125,7 @@ impl BoardState {
             PieceType::Queen => Self::is_diagnol(from, to) || self.is_slide(from, to),
         }
     }
+    /// Will try to upgrade piece at pos index to queen. Will do nothing if not a pawn and not at the last row of the board.
     fn try_pawn_upgrade(&mut self, pos: usize) {
         match &mut self.points[pos] {
             Some(p) => {
@@ -145,22 +143,27 @@ impl BoardState {
             None => (),
         }
     }
-    fn row_num(pos: usize) -> usize {
+    /// returns the row number of the given index pos
+    pub fn row_num(pos: usize) -> usize {
         pos / 8
     }
-    fn col_num(pos: usize) -> usize {
+    /// returns the column number of the given index pos
+    pub fn col_num(pos: usize) -> usize {
         pos % 8
     }
-    fn is_adjacent(from: usize, to: usize) -> bool {
+    /// returns bool whether or not index 1 to index 2 is an adjacent move
+    pub fn is_adjacent(from: usize, to: usize) -> bool {
         matches!(from as i32 - to as i32, 8 | -8 | 1 | -1 | -9 | -7 | 9 | 7)
     }
-    fn is_adjacent_diagnol_forward(from: usize, to: usize, color: PlayerColor) -> bool {
+    /// returns bool whether or not index 1 to index 2 is an adjacent move that is also forward and diagonal
+    pub fn is_adjacent_diagnol_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
             PlayerColor::White => matches!(from as i32 - to as i32, -7 | -9),
             PlayerColor::Black => matches!(from as i32 - to as i32, 7 | 9),
         }
     }
-    fn forward_twice_on_1_or_6(from: usize, to: usize, color: PlayerColor) -> bool {
+    /// returns bool whether or not index 1 to index 2 is a forward twice move, where the first index has to be on row 1 or 6
+    pub fn forward_twice_on_1_or_6(from: usize, to: usize, color: PlayerColor) -> bool {
         if Self::row_num(from) != 1 && Self::row_num(from) != 6 {
             return false;
         }
@@ -172,17 +175,20 @@ impl BoardState {
             PlayerColor::Black => matches!(from as i32 - to as i32, 16),
         }
     }
-    fn is_diagnol(from: usize, to: usize) -> bool {
+    /// returns bool whether or not index 1 to index 2 is a diagonal move
+    pub fn is_diagnol(from: usize, to: usize) -> bool {
         let dist = from as i32 - to as i32;
         dist % 9 == 0 || dist % 7 == 0
     }
-    fn is_knight_hop(from: usize, to: usize) -> bool {
+    /// returns bool whether or not index 1 to index 2 is a valid knight hop move
+    pub fn is_knight_hop(from: usize, to: usize) -> bool {
         matches!(
             from as i32 - to as i32,
             17 | 15 | -17 | -15 | -10 | -6 | 10 | 6
         )
     }
-    fn is_slide(&self, from: usize, to: usize) -> bool {
+    /// returns bool whether or not index 1 to index 2 is a slide move (movement horizontall or vertically)
+    pub fn is_slide(&self, from: usize, to: usize) -> bool {
         let dist = to as i32 - from as i32;
         let is_row = from / 8 == to / 8;
         let is_col = dist % 8 == 0;
@@ -236,13 +242,15 @@ impl BoardState {
 
         true
     }
-    fn is_forward(from: usize, to: usize, color: PlayerColor) -> bool {
+    /// returns bool whether or not index 1 to index 2 is a forward by one square move
+    pub fn is_forward(from: usize, to: usize, color: PlayerColor) -> bool {
         match color {
             PlayerColor::White => from + 8 == to,
             PlayerColor::Black => from - 8 == to,
         }
     }
-    fn are_friendly(&self, i1: usize, i2: usize) -> bool {
+    /// returns bool whether or not pieces at index 1 and index 2 are friendly
+    pub fn are_friendly(&self, i1: usize, i2: usize) -> bool {
         if let (Some(p1), Some(p2)) = (self.points[i1], self.points[i2]) {
             return Piece::are_friendly(&p1, &p2);
         }
